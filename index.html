@@ -6,12 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Dvir Cohen - Senior Data Scientist CV presented as an 8-bit RPG game. Explore skills, experience, and publications in an interactive format.">
     <title>Dvir Cohen - 8-Bit RPG CV</title>
-    <meta property="og:title" content="Dvir Cohen - 8-Bit CV" />
-    <meta property="og:description" content="Dvir Cohen CV presented as an 8-bit game. Come explore!" />
-    <meta property="og:image" content="https://i.imgur.com/PHKdqGW.pn" />
-    <meta property="og:url" content="http://dvircohen.com" />
-    <meta property="og:type" content="website" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -271,7 +265,7 @@ body {
     width: 100%;
     max-width: 800px;
     margin-bottom: 20px;
-    padding: 15px;
+    padding: 5px;
     background-color: rgba(42, 40, 51, 0.9);
     border: 3px solid var(--border-color);
     border-radius: 0px;
@@ -617,7 +611,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 1px;
     cursor: pointer;
     transition: all var(--transition-speed);
     box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
@@ -747,7 +741,7 @@ body {
 .skill-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
+    gap: 10px;
     width: 100%;
 }
 
@@ -1520,7 +1514,7 @@ body {
     }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 200px) {
     .skill-grid,
     .contact-methods {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -1595,7 +1589,8 @@ a:focus, button:focus, [tabindex="0"]:focus {
     <!-- Game UI Header -->
     <div class="game-ui-header">
         <div class="player-stats">
-            <div class="player-name">DVIR COHEN <span class="player-level" id="playerLevel">LVL 1</span></div>
+            <div class="player-name">DVIR COHEN </div>
+            <div><span class="player-level" id="playerLevel">LVL 1</span></div>
             <div class="stat-bars">
                 <div class="stat-row">
                     <div class="stat-label">HP</div>
@@ -1769,7 +1764,7 @@ a:focus, button:focus, [tabindex="0"]:focus {
                                     <div class="inventory-name">PROJECT LEADERSHIP</div>
                                     <div class="inventory-tooltip">
                                         <div class="tooltip-title">PROJECT LEADERSHIP</div>
-                                        <div class="tooltip-desc">Led cross-functional teams in developing and implementing data science solutions</div>
+                                        <div class="tooltip-desc">Worked with cross-functional teams in developing and implementing data science solutions</div>
                                         <div class="tooltip-stat">+40 Leadership</div>
                                         <div class="tooltip-stat">+35 Team Management</div>
                                     </div>
@@ -1804,11 +1799,11 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
             <div class="quest-list">
                 <div class="quest-item">
-                    <div class="quest-level">SENIOR</div>
+                    <div class="quest-level">TECH LEAD</div>
                     <div class="quest-header">
                         <div class="quest-icon"><img src="https://logos-world.net/wp-content/uploads/2020/11/WIX-Logo.jpg" alt="Wix" style="width: 70px; height: 30px;"></div>
                         <div>
-                            <div class="quest-title">SENIOR DATA SCIENTIST</div>
+                            <div class="quest-title">DATA SCIENCE TECH LEAD</div>
                             <div class="quest-company">Wix.com</div>
                             <div class="quest-date">December 2021 – Present</div>
                         </div>
@@ -1863,10 +1858,6 @@ a:focus, button:focus, [tabindex="0"]:focus {
                                 <div class="achievement-marker"></div>
                                 <div class="achievement-text">Managed the entire product pipeline: exploratory analysis, feature engineering, algorithm development, evaluation, and incorporating customer feedback</div>
                             </div>
-                            <div class="quest-achievement">
-                                <div class="achievement-marker"></div>
-                                <div class="achievement-text">Successfully executed multiple machine learning proof-of-concepts, resulting in over $500,000 increase in annual recurring revenue</div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1896,10 +1887,6 @@ a:focus, button:focus, [tabindex="0"]:focus {
                             <div class="quest-achievement">
                                 <div class="achievement-marker"></div>
                                 <div class="achievement-text">Led the analytic components of products, including exploratory analysis, feature engineering, algorithm development, and evaluation</div>
-                            </div>
-                            <div class="quest-achievement">
-                                <div class="achievement-marker"></div>
-                                <div class="achievement-text">Designed big data systems for telecom security-fraud analytics</div>
                             </div>
                         </div>
                     </div>
@@ -1986,7 +1973,7 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
                     <div class="skill-item legendary" tabindex="0">
                         <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/1072/1072402.png" alt="RAG" style="width: 30px; height: 30px;"></div>
-                        <div class="skill-name">RETRIEVAL-AUGMENTED GENERATION</div>
+                        <div class="skill-name">RAG</div>
                         <div class="skill-tooltip">
                             <div class="tooltip-title">RETRIEVAL-AUGMENTED GENERATION (RAG)</div>
                             <div class="tooltip-desc">Infusing LLMs with external sources for grounded truth.</div>
@@ -2075,9 +2062,9 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
                     <div class="skill-item legendary" tabindex="0">
                         <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/2910/2910824.png" alt="Model Evaluation" style="width: 30px; height: 30px;"></div>
-                        <div class="skill-name">MODEL EVALUATION & VALIDATION</div>
+                        <div class="skill-name">MODEL EVALUATION</div>
                         <div class="skill-tooltip">
-                            <div class="tooltip-title">MODEL EVALUATION & VALIDATION</div>
+                            <div class="tooltip-title">MODEL EVALUATION</div>
                             <div class="tooltip-desc">Cross-validation, metrics, and test sets—your training dojo.</div>
                             <div class="tooltip-stat">🧪 +50 Reliability</div>
                             <div class="tooltip-stat">🔁 +40 Reproducibility</div>
@@ -2116,9 +2103,9 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
                     <div class="skill-item legendary" tabindex="0">
                         <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/9090/9090646.png" alt="Hugging Face" style="width: 30px; height: 30px;"></div>
-                        <div class="skill-name">HUGGING FACE TRANSFORMERS</div>
+                        <div class="skill-name">HUGGING FACE</div>
                         <div class="skill-tooltip">
-                            <div class="tooltip-title">HUGGING FACE TRANSFORMERS</div>
+                            <div class="tooltip-title">HUGGING FACE</div>
                             <div class="tooltip-desc">Gateway to a world of ready-made LLMs and embeddings.</div>
                             <div class="tooltip-stat">📦 +55 Model Access</div>
                             <div class="tooltip-stat">⚙️ +50 Transfer Learning</div>
@@ -2128,9 +2115,9 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
                     <div class="skill-item legendary" tabindex="0">
                         <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/6911/6911553.png" alt="LangChain" style="width: 30px; height: 30px;"></div>
-                        <div class="skill-name">LANGCHAIN, LLAMAINDEX</div>
+                        <div class="skill-name">LANGCHAIN</div>
                         <div class="skill-tooltip">
-                            <div class="tooltip-title">LANGCHAIN, LLAMAINDEX</div>
+                            <div class="tooltip-title">LANGCHAIN</div>
                             <div class="tooltip-desc">Your framework for chaining tools, memory, and logic into LLM agents.</div>
                             <div class="tooltip-stat">🧱 +60 Modular Design</div>
                             <div class="tooltip-stat">🧠 +45 Agent Orchestration</div>
@@ -2731,7 +2718,7 @@ a:focus, button:focus, [tabindex="0"]:focus {
             // Download CV functionality
             document.getElementById('downloadCV').addEventListener('click', function(e) {
                 e.preventDefault();
-                alert('PDF will be added soon, for now you can Email me and I will send it.');
+                alert('CV Download would be available here. This is a placeholder link.');
             });
             
             // Add easter egg - Konami code (up, up, down, down, left, right, left, right, B, A)

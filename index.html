@@ -145,6 +145,146 @@ body {
     width: 10%;
 }
 
+/* Achievement system styles */
+.achievements-indicator {
+    position: relative;
+    cursor: pointer;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.achievements-icon {
+    color: #ffd700;
+    font-size: 14px;
+}
+
+.achievements-count {
+    font-size: 10px;
+    color: var(--primary-text);
+}
+
+.achievements-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    background-color: var(--secondary-bg);
+    border: 3px solid var(--border-color);
+    z-index: 2000;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.achievements-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--highlight-color);
+}
+
+.achievements-title {
+    font-size: 16px;
+    color: var(--primary-text);
+}
+
+.achievements-close {
+    background: none;
+    border: none;
+    color: var(--primary-text);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.achievement-item {
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    background-color: var(--primary-bg);
+    text-align: center;
+    opacity: 0.5;
+    transition: all 0.3s;
+}
+
+.achievement-item.unlocked {
+    opacity: 1;
+    border-color: #ffd700;
+}
+
+.achievement-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ffd700;
+}
+
+.achievement-name {
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: var(--primary-text);
+}
+
+.achievement-desc {
+    font-size: 8px;
+    color: var(--secondary-text);
+}
+
+.achievement-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--secondary-bg);
+    border: 2px solid #ffd700;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1500;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    max-width: 300px;
+}
+
+.achievement-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification-icon {
+    font-size: 20px;
+    color: #ffd700;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-size: 12px;
+    color: #ffd700;
+    margin-bottom: 5px;
+}
+
+.notification-desc {
+    font-size: 8px;
+    color: var(--primary-text);
+}
+
 .game-menu {
     display: flex;
     gap: 10px;
@@ -252,6 +392,8 @@ body {
     text-shadow: 2px 2px 0 var(--secondary-bg);
     font-size: 24px;
     animation: titleGlow 2s ease-in-out infinite alternate;
+    position: relative;
+    z-index: 10;
 }
 
 .section-subtitle {
@@ -259,6 +401,8 @@ body {
     font-size: 16px;
     margin-bottom: 20px;
     text-shadow: 1px 1px 0 rgba(26, 24, 34, 0.6);
+    position: relative;
+    z-index: 10;
 }
 
 .game-panel {
@@ -271,6 +415,8 @@ body {
     border-radius: 0px;
     box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
     transition: transform var(--transition-speed);
+    position: relative;
+    z-index: 10;
 }
 
 .game-panel:hover {
@@ -284,7 +430,7 @@ body {
     text-align: center;
 }
 
-/* Pixelated background elements */
+/* Pixelated background elements with parallax */
 .scene-background {
     position: absolute;
     top: 0;
@@ -292,56 +438,137 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    transition: background-color 0.5s;
+    overflow: hidden;
+}
+
+.parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: repeat;
+    will-change: transform;
+}
+
+.bg-layer-1 {
+    z-index: 1;
+    background-size: 10px 10px;
+}
+
+.bg-layer-2 {
+    z-index: 2;
+    background-size: 15px 15px;
+    opacity: 0.7;
+}
+
+.bg-layer-3 {
+    z-index: 3;
+    background-size: 20px 20px;
+    opacity: 0.5;
 }
 
 /* Different background styles for different sections */
-.welcome-bg {
+.welcome-bg .bg-layer-1 {
     background-color: var(--primary-bg);
     background-image:
         linear-gradient(0deg, #232431 10%, transparent 10%),
         linear-gradient(90deg, rgba(42, 40, 58, 0.5) 10%, transparent 10%);
-    background-size: 10px 10px;
 }
 
-.experience-bg {
+.welcome-bg .bg-layer-2 {
+    background-image: radial-gradient(circle, rgba(60, 58, 80, 0.1) 10%, transparent 10%);
+    background-size: 30px 30px;
+}
+
+.welcome-bg .bg-layer-3 {
+    background-image: linear-gradient(45deg, rgba(100, 100, 130, 0.1) 25%, transparent 25%, transparent 50%, rgba(100, 100, 130, 0.1) 50%, rgba(100, 100, 130, 0.1) 75%, transparent 75%, transparent);
+    background-size: 40px 40px;
+}
+
+.experience-bg .bg-layer-1 {
     background-color: #2f2a37;
     background-image:
         linear-gradient(0deg, #252230 10%, transparent 10%),
         linear-gradient(90deg, rgba(48, 44, 58, 0.4) 10%, transparent 10%);
-    background-size: 15px 15px;
 }
 
-.skills-bg {
+.experience-bg .bg-layer-2 {
+    background-image: radial-gradient(circle, rgba(70, 60, 90, 0.1) 10%, transparent 10%);
+    background-size: 25px 25px;
+}
+
+.experience-bg .bg-layer-3 {
+    background-image: linear-gradient(45deg, rgba(110, 100, 140, 0.1) 25%, transparent 25%, transparent 50%, rgba(110, 100, 140, 0.1) 50%, rgba(110, 100, 140, 0.1) 75%, transparent 75%, transparent);
+    background-size: 35px 35px;
+}
+
+.skills-bg .bg-layer-1 {
     background-color: #2d3334;
     background-image:
         linear-gradient(0deg, #242a2b 10%, transparent 10%),
         linear-gradient(90deg, rgba(45, 51, 52, 0.4) 10%, transparent 10%);
-    background-size: 12px 12px;
 }
 
-.education-bg {
+.skills-bg .bg-layer-2 {
+    background-image: radial-gradient(circle, rgba(60, 70, 75, 0.1) 10%, transparent 10%);
+    background-size: 25px 25px;
+}
+
+.skills-bg .bg-layer-3 {
+    background-image: linear-gradient(45deg, rgba(90, 100, 110, 0.1) 25%, transparent 25%, transparent 50%, rgba(90, 100, 110, 0.1) 50%, rgba(90, 100, 110, 0.1) 75%, transparent 75%, transparent);
+    background-size: 35px 35px;
+}
+
+.education-bg .bg-layer-1 {
     background-color: #33293a;
     background-image:
         linear-gradient(0deg, #29222f 10%, transparent 10%),
         linear-gradient(90deg, rgba(51, 41, 58, 0.4) 10%, transparent 10%);
-    background-size: 10px 10px;
 }
 
-.publications-bg {
+.education-bg .bg-layer-2 {
+    background-image: radial-gradient(circle, rgba(65, 50, 75, 0.1) 10%, transparent 10%);
+    background-size: 30px 30px;
+}
+
+.education-bg .bg-layer-3 {
+    background-image: linear-gradient(45deg, rgba(95, 80, 110, 0.1) 25%, transparent 25%, transparent 50%, rgba(95, 80, 110, 0.1) 50%, rgba(95, 80, 110, 0.1) 75%, transparent 75%, transparent);
+    background-size: 40px 40px;
+}
+
+.publications-bg .bg-layer-1 {
     background-color: #353129;
     background-image:
         linear-gradient(0deg, #2b2821 10%, transparent 10%),
         linear-gradient(90deg, rgba(53, 49, 41, 0.4) 10%, transparent 10%);
-    background-size: 15px 15px;
 }
 
-.contact-bg {
+.publications-bg .bg-layer-2 {
+    background-image: radial-gradient(circle, rgba(70, 65, 50, 0.1) 10%, transparent 10%);
+    background-size: 30px 30px;
+}
+
+.publications-bg .bg-layer-3 {
+    background-image: linear-gradient(45deg, rgba(100, 95, 75, 0.1) 25%, transparent 25%, transparent 50%, rgba(100, 95, 75, 0.1) 50%, rgba(100, 95, 75, 0.1) 75%, transparent 75%, transparent);
+    background-size: 40px 40px;
+}
+
+.contact-bg .bg-layer-1 {
     background-color: #2a3035;
     background-image:
         linear-gradient(0deg, #22262b 10%, transparent 10%),
         linear-gradient(90deg, rgba(42, 48, 53, 0.4) 10%, transparent 10%);
-    background-size: 8px 8px;
+}
+
+.contact-bg .bg-layer-2 {
+    background-image: radial-gradient(circle, rgba(55, 60, 70, 0.1) 10%, transparent 10%);
+    background-size: 25px 25px;
+}
+
+.contact-bg .bg-layer-3 {
+    background-image: linear-gradient(45deg, rgba(80, 90, 100, 0.1) 25%, transparent 25%, transparent 50%, rgba(80, 90, 100, 0.1) 50%, rgba(80, 90, 100, 0.1) 75%, transparent 75%, transparent);
+    background-size: 35px 35px;
 }
 
 /* Pixel art clouds */
@@ -352,7 +579,7 @@ body {
     width: 200%;
     height: 50px;
     animation: cloudMove 120s linear infinite;
-    z-index: -1;
+    z-index: 4;
 }
 
 .pixel-cloud {
@@ -396,7 +623,7 @@ body {
     left: 0;
     width: 100%;
     height: 30px;
-    z-index: -1;
+    z-index: 4;
     transition: background-color 0.5s;
 }
 
@@ -444,6 +671,8 @@ body {
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
+    position: relative;
+    z-index: 10;
 }
 
 .inventory-row {
@@ -523,6 +752,8 @@ body {
     align-items: center;
     gap: 15px;
     margin-top: 20px;
+    position: relative;
+    z-index: 10;
 }
 
 .start-button {
@@ -591,6 +822,7 @@ body {
     font-size: 14px;
     animation: blink 1s infinite;
     text-shadow: 1px 1px 0 rgba(26, 24, 34, 0.7);
+    z-index: 10;
 }
 
 /* New inventory grid for skills and achievements */
@@ -853,6 +1085,8 @@ body {
 .quest-list {
     width: 100%;
     max-width: 800px;
+    position: relative;
+    z-index: 10;
 }
 
 .quest-item {
@@ -958,6 +1192,8 @@ body {
 .education-list {
     width: 100%;
     max-width: 800px;
+    position: relative;
+    z-index: 10;
 }
 
 .education-item {
@@ -1033,6 +1269,8 @@ body {
 .scroll-list {
     width: 100%;
     max-width: 800px;
+    position: relative;
+    z-index: 10;
 }
 
 .scroll-item {
@@ -1119,6 +1357,8 @@ body {
     border-radius: 0px;
     margin-bottom: 30px;
     box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
 }
 
 .dialog-text {
@@ -1141,6 +1381,8 @@ body {
     gap: 15px;
     width: 100%;
     max-width: 800px;
+    position: relative;
+    z-index: 10;
 }
 
 .contact-method {
@@ -1180,7 +1422,10 @@ body {
     .back-to-top,
     .welcome-actions,
     .press-start,
-    .crt-effect {
+    .crt-effect,
+    .achievements-indicator,
+    .achievements-modal,
+    .achievement-notification {
         display: none !important;
     }
     
@@ -1216,6 +1461,8 @@ body {
     padding: 20px;
     text-align: center;
     border-top: 3px solid var(--accent-color);
+    position: relative;
+    z-index: 10;
 }
 
 .footer-text {
@@ -1512,6 +1759,16 @@ body {
         height: 40px;
         font-size: 16px;
     }
+    
+    /* Adjust achievements modal for mobile */
+    .achievements-modal {
+        width: 95%;
+        max-width: none;
+    }
+    
+    .achievements-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
 }
 
 @media (max-width: 200px) {
@@ -1580,6 +1837,26 @@ a:focus, button:focus, [tabindex="0"]:focus {
         <div class="loading-tip" id="loadingTip">Did you know? Dvir has published multiple research papers in respected computer science journals!</div>
     </div>
 
+    <!-- Achievement notification -->
+    <div class="achievement-notification" id="achievementNotification">
+        <div class="notification-icon">🏆</div>
+        <div class="notification-content">
+            <div class="notification-title">Achievement Unlocked!</div>
+            <div class="notification-desc" id="notificationDesc">You've unlocked a new achievement</div>
+        </div>
+    </div>
+
+    <!-- Achievements modal -->
+    <div class="achievements-modal" id="achievementsModal">
+        <div class="achievements-header">
+            <div class="achievements-title">ACHIEVEMENTS</div>
+            <button class="achievements-close" id="closeAchievements">X</button>
+        </div>
+        <div class="achievements-grid" id="achievementsGrid">
+            <!-- Achievements will be inserted here via JavaScript -->
+        </div>
+    </div>
+
     <!-- CRT screen effect overlay -->
     <div class="crt-effect"></div>
 
@@ -1611,6 +1888,10 @@ a:focus, button:focus, [tabindex="0"]:focus {
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="achievements-indicator" id="achievementsIndicator">
+            <div class="achievements-icon">🏆</div>
+            <div class="achievements-count" id="achievementsCount">0/10</div>
         </div>
         <div class="game-menu">
             <button class="menu-button" data-goto="welcome">HOME</button>
@@ -1648,7 +1929,11 @@ a:focus, button:focus, [tabindex="0"]:focus {
     <div class="game-container">
         <!-- Welcome/Title Section -->
         <section id="welcome" class="game-section">
-            <div class="scene-background welcome-bg"></div>
+            <div class="scene-background welcome-bg">
+                <div class="parallax-layer bg-layer-1"></div>
+                <div class="parallax-layer bg-layer-2"></div>
+                <div class="parallax-layer bg-layer-3"></div>
+            </div>
             <div class="pixel-clouds">
                 <div class="pixel-cloud cloud1"></div>
                 <div class="pixel-cloud cloud2"></div>
@@ -1777,7 +2062,7 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
             <div class="welcome-actions">
                 <button class="start-button" id="startButton" aria-label="Start exploring the CV">START ADVENTURE</button>
-                <a href="#" class="download-resume" id="downloadCV" aria-label="Download CV as PDF">DOWNLOAD CV.PDF</a>
+                <a href="dvir_cv.pdf" class="download-resume" id="downloadCV" aria-label="Download CV as PDF" download>DOWNLOAD CV.PDF</a>
             </div>
 
             <div class="press-start">PRESS SPACE OR SCROLL TO CONTINUE</div>
@@ -1785,7 +2070,11 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
         <!-- Experience/Quests Section -->
         <section id="experience" class="game-section">
-            <div class="scene-background experience-bg"></div>
+            <div class="scene-background experience-bg">
+                <div class="parallax-layer bg-layer-1"></div>
+                <div class="parallax-layer bg-layer-2"></div>
+                <div class="parallax-layer bg-layer-3"></div>
+            </div>
             <div class="pixel-clouds">
                 <div class="pixel-cloud cloud1"></div>
                 <div class="pixel-cloud cloud2"></div>
@@ -1926,7 +2215,11 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
         <!-- Skills/Inventory Section -->
         <section id="skills" class="game-section">
-            <div class="scene-background skills-bg"></div>
+            <div class="scene-background skills-bg">
+                <div class="parallax-layer bg-layer-1"></div>
+                <div class="parallax-layer bg-layer-2"></div>
+                <div class="parallax-layer bg-layer-3"></div>
+            </div>
             <div class="ground skills-ground"></div>
 
             <h1 class="section-title">SKILL INVENTORY</h1>
@@ -2179,7 +2472,11 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
         <!-- Education/Training Section -->
         <section id="education" class="game-section">
-            <div class="scene-background education-bg"></div>
+            <div class="scene-background education-bg">
+                <div class="parallax-layer bg-layer-1"></div>
+                <div class="parallax-layer bg-layer-2"></div>
+                <div class="parallax-layer bg-layer-3"></div>
+            </div>
             <div class="ground education-ground"></div>
 
             <h1 class="section-title">TRAINING & LEARNING</h1>
@@ -2220,7 +2517,11 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
         <!-- Publications Section -->
         <section id="publications" class="game-section">
-            <div class="scene-background publications-bg"></div>
+            <div class="scene-background publications-bg">
+                <div class="parallax-layer bg-layer-1"></div>
+                <div class="parallax-layer bg-layer-2"></div>
+                <div class="parallax-layer bg-layer-3"></div>
+            </div>
             <div class="ground publications-ground"></div>
 
             <h1 class="section-title">KNOWLEDGE SCROLLS</h1>
@@ -2320,7 +2621,11 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
         <!-- Contact Section -->
         <section id="contact" class="game-section">
-            <div class="scene-background contact-bg"></div>
+            <div class="scene-background contact-bg">
+                <div class="parallax-layer bg-layer-1"></div>
+                <div class="parallax-layer bg-layer-2"></div>
+                <div class="parallax-layer bg-layer-3"></div>
+            </div>
             <div class="ground contact-ground"></div>
 
             <h1 class="section-title">CONTACT QUEST</h1>
@@ -2383,6 +2688,219 @@ a:focus, button:focus, [tabindex="0"]:focus {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Define achievements
+            const achievements = [
+                {
+                    id: 'visitor',
+                    name: 'Curious Visitor',
+                    icon: '🏠',
+                    description: 'Visited the homepage and learned about Dvir'
+                },
+                {
+                    id: 'explorer',
+                    name: 'Site Explorer',
+                    icon: '🧭',
+                    description: 'Visited all main sections of the CV'
+                },
+                {
+                    id: 'researcher',
+                    name: 'Research Enthusiast',
+                    icon: '📝',
+                    description: 'Viewed all published research papers'
+                },
+                {
+                    id: 'skill_master',
+                    name: 'Skill Master',
+                    icon: '🧙‍♂️',
+                    description: 'Explored multiple skills in depth'
+                },
+                {
+                    id: 'downloader',
+                    name: 'CV Collector',
+                    icon: '📥',
+                    description: 'Downloaded the full CV PDF'
+                },
+                {
+                    id: 'quest_tracker',
+                    name: 'Quest Tracker',
+                    icon: '🔍',
+                    description: 'Reviewed all work experience quests'
+                },
+                {
+                    id: 'contacter',
+                    name: 'Ready to Connect',
+                    icon: '📞',
+                    description: 'Visited the contact section'
+                },
+                {
+                    id: 'education_seeker',
+                    name: 'Education Seeker',
+                    icon: '🎓',
+                    description: 'Learned about educational background'
+                },
+                {
+                    id: 'night_owl',
+                    name: 'Night Owl',
+                    icon: '🦉',
+                    description: 'Visited the site after hours (8PM-6AM)'
+                },
+                {
+                    id: 'easteregg_finder',
+                    name: 'Easter Egg Hunter',
+                    icon: '🥚',
+                    description: 'Found a hidden secret in the CV'
+                }
+            ];
+            
+            // Initialize achievement system
+            let unlockedAchievements = {};
+            
+            // Try to load saved achievements from localStorage
+            try {
+                const saved = localStorage.getItem('dvirCvAchievements');
+                if (saved) {
+                    unlockedAchievements = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.log('Could not load saved achievements', e);
+            }
+            
+            // Set up achievement display
+            const achievementsGrid = document.getElementById('achievementsGrid');
+            const achievementsCount = document.getElementById('achievementsCount');
+            
+            function renderAchievements() {
+                // Clear existing achievements
+                achievementsGrid.innerHTML = '';
+                
+                // Count unlocked achievements
+                const unlockedCount = Object.keys(unlockedAchievements).length;
+                achievementsCount.textContent = `${unlockedCount}/${achievements.length}`;
+                
+                // Render all achievements
+                achievements.forEach(achievement => {
+                    const isUnlocked = unlockedAchievements[achievement.id];
+                    const achievementEl = document.createElement('div');
+                    achievementEl.className = `achievement-item ${isUnlocked ? 'unlocked' : ''}`;
+                    
+                    achievementEl.innerHTML = `
+                        <div class="achievement-icon">${achievement.icon}</div>
+                        <div class="achievement-name">${isUnlocked ? achievement.name : '???'}</div>
+                        <div class="achievement-desc">${isUnlocked ? achievement.description : 'Locked achievement'}</div>
+                    `;
+                    
+                    achievementsGrid.appendChild(achievementEl);
+                });
+            }
+            
+            // Function to unlock an achievement
+            function unlockAchievement(id) {
+                if (unlockedAchievements[id]) {
+                    return; // Already unlocked
+                }
+                
+                // Find the achievement
+                const achievement = achievements.find(a => a.id === id);
+                if (!achievement) return;
+                
+                // Mark as unlocked
+                unlockedAchievements[id] = true;
+                
+                // Save to localStorage
+                try {
+                    localStorage.setItem('dvirCvAchievements', JSON.stringify(unlockedAchievements));
+                } catch (e) {
+                    console.log('Could not save achievements', e);
+                }
+                
+                // Update the display
+                renderAchievements();
+                
+                // Show notification
+                const notification = document.getElementById('achievementNotification');
+                const notificationDesc = document.getElementById('notificationDesc');
+                
+                notificationDesc.textContent = achievement.description;
+                notification.classList.add('show');
+                
+                // Hide after 5 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+            }
+            
+            // Render initial achievements
+            renderAchievements();
+            
+            // Set up achievement modal toggle
+            const achievementsIndicator = document.getElementById('achievementsIndicator');
+            const achievementsModal = document.getElementById('achievementsModal');
+            const closeAchievements = document.getElementById('closeAchievements');
+            
+            achievementsIndicator.addEventListener('click', function() {
+                achievementsModal.style.display = 'block';
+            });
+            
+            closeAchievements.addEventListener('click', function() {
+                achievementsModal.style.display = 'none';
+            });
+            
+            // Close modal if clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === achievementsModal) {
+                    achievementsModal.style.display = 'none';
+                }
+            });
+            
+            // Unlock achievements based on user actions
+            
+            // Visitor achievement - unlock immediately
+            setTimeout(() => {
+                unlockAchievement('visitor');
+            }, 3000);
+            
+            // Night Owl achievement - check time
+            const currentHour = new Date().getHours();
+            if (currentHour >= 20 || currentHour < 6) {
+                unlockAchievement('night_owl');
+            }
+            
+            // Track visited sections
+            const visitedSections = new Set();
+            
+            function checkAllSectionsVisited() {
+                const allSections = ['welcome', 'experience', 'skills', 'education', 'publications', 'contact'];
+                const allVisited = allSections.every(section => visitedSections.has(section));
+                
+                if (allVisited) {
+                    unlockAchievement('explorer');
+                }
+            }
+            
+            // Add parallax scrolling effect
+            function updateParallax() {
+                const sections = document.querySelectorAll('.game-section');
+                const scrollY = window.scrollY;
+                
+                sections.forEach(section => {
+                    const layers = section.querySelectorAll('.parallax-layer');
+                    const rect = section.getBoundingClientRect();
+                    const sectionTop = rect.top + scrollY;
+                    const sectionHeight = rect.height;
+                    
+                    // Check if section is in viewport
+                    if (scrollY + window.innerHeight > sectionTop && scrollY < sectionTop + sectionHeight) {
+                        const relativeScroll = scrollY - sectionTop;
+                        
+                        layers.forEach((layer, index) => {
+                            const speed = 0.2 + (index * 0.1);
+                            const yOffset = relativeScroll * speed;
+                            layer.style.transform = `translateY(${yOffset}px)`;
+                        });
+                    }
+                });
+            }
+            
             // Simulate loading screen
             // Clear typing text immediately when page loads
             const typingText = document.getElementById('typingText');
@@ -2462,6 +2980,28 @@ a:focus, button:focus, [tabindex="0"]:focus {
                         top: section.offsetTop,
                         behavior: 'smooth'
                     });
+                    
+                    // Add to visited sections for achievement tracking
+                    visitedSections.add(sectionId);
+                    
+                    // Check for section-specific achievements
+                    switch(sectionId) {
+                        case 'experience':
+                            setTimeout(() => unlockAchievement('quest_tracker'), 3000);
+                            break;
+                        case 'education':
+                            unlockAchievement('education_seeker');
+                            break;
+                        case 'contact':
+                            unlockAchievement('contacter');
+                            break;
+                        case 'publications':
+                            setTimeout(() => unlockAchievement('researcher'), 5000);
+                            break;
+                    }
+                    
+                    // Check if all sections visited
+                    checkAllSectionsVisited();
                 }
             }
 
@@ -2518,8 +3058,14 @@ a:focus, button:focus, [tabindex="0"]:focus {
                     if (scrollPosition >= sectionTop - 100 &&
                         scrollPosition < sectionTop + sectionHeight - 100) {
                         currentSectionId = section.id;
+                        
+                        // Add to visited sections for achievement tracking
+                        visitedSections.add(currentSectionId);
                     }
                 });
+                
+                // Check for achievement
+                checkAllSectionsVisited();
 
                 // Update navigation highlights
                 if (currentSectionId) {
@@ -2568,6 +3114,9 @@ a:focus, button:focus, [tabindex="0"]:focus {
                         backToTop.classList.remove('visible');
                     }
                 }
+                
+                // Update parallax effect
+                updateParallax();
             }
 
             // Start typing effects for dialog text
@@ -2644,6 +3193,19 @@ a:focus, button:focus, [tabindex="0"]:focus {
                 }, 100);
             }
 
+            // Track skill item interactions for achievement
+            const skillItems = document.querySelectorAll('.skill-item');
+            let skillItemsClicked = new Set();
+            
+            skillItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    skillItemsClicked.add(this);
+                    if (skillItemsClicked.size >= 5) {
+                        unlockAchievement('skill_master');
+                    }
+                });
+            });
+
             // Scroll handling
             window.addEventListener('scroll', function() {
                 updateActiveNavigation();
@@ -2676,7 +3238,7 @@ a:focus, button:focus, [tabindex="0"]:focus {
             updateActiveNavigation();
 
             // Add animation to skill items when they come into view
-            const skillItems = document.querySelectorAll('.skill-item, .inventory-slot');
+            const skillElements = document.querySelectorAll('.skill-item, .inventory-slot');
 
             const skillObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -2688,7 +3250,7 @@ a:focus, button:focus, [tabindex="0"]:focus {
                 });
             }, { threshold: 0.1 });
 
-            skillItems.forEach(item => {
+            skillElements.forEach(item => {
                 item.style.opacity = '0';
                 item.style.transform = 'translateY(20px)';
                 item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
@@ -2716,9 +3278,9 @@ a:focus, button:focus, [tabindex="0"]:focus {
             });
             
             // Download CV functionality
-            document.getElementById('downloadCV').addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('CV Download would be available here. This is a placeholder link.');
+            document.getElementById('downloadCV').addEventListener('click', function() {
+                // Unlock achievement
+                unlockAchievement('downloader');
             });
             
             // Add easter egg - Konami code (up, up, down, down, left, right, left, right, B, A)
@@ -2731,6 +3293,7 @@ a:focus, button:focus, [tabindex="0"]:focus {
                     if (konamiIndex === konamiCode.length) {
                         // Activate easter egg
                         alert('🎮 Cheat code activated! You found an easter egg. Dvir would be impressed!');
+                        unlockAchievement('easteregg_finder');
                         konamiIndex = 0;
                     }
                 } else {

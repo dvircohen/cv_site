@@ -1,0 +1,2278 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dvir Cohen - 8-Bit RPG CV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #2a2833;
+    color: #e0dece;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+    image-rendering: pixelated;
+    line-height: 2;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    background: #1a1822;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #706454;
+    border: 2px solid #2a2833;
+}
+
+/* Main container */
+.game-container {
+    width: 100%;
+    position: relative;
+}
+
+/* Game UI header that stays fixed at the top */
+.game-ui-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(26, 24, 34, 0.95);
+    border-bottom: 3px solid #706454;
+    padding: 10px;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-stats {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    font-size: 12px;
+}
+
+.player-name {
+    color: #e0dece;
+}
+
+.player-level {
+    color: #7a9463;
+}
+
+.stat-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stat-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-label {
+    width: 30px;
+    color: #a08c70;
+    font-size: 10px;
+}
+
+.stat-bar {
+    width: 100px;
+    height: 10px;
+    background-color: #3a3745;
+    border: 1px solid #58535e;
+    position: relative;
+}
+
+.stat-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.hp-fill {
+    background-color: #8c4646;
+    width: 20%;
+}
+
+.mp-fill {
+    background-color: #465b78;
+    width: 15%;
+}
+
+.xp-fill {
+    background-color: #567846;
+    width: 10%;
+}
+
+.game-menu {
+    display: flex;
+    gap: 10px;
+}
+
+.menu-button {
+    background-color: #3a3745;
+    color: #e0dece;
+    font-size: 10px;
+    padding: 5px 10px;
+    border: 2px solid #58535e;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.menu-button:hover {
+    background-color: #4e4b5a;
+}
+
+/* Navigation sidebar */
+.game-navigation {
+    position: fixed;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.nav-item {
+    width: 20px;
+    height: 20px;
+    background-color: #3a3745;
+    border: 2px solid #58535e;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.nav-item:hover, .nav-item.active {
+    background-color: #706454;
+}
+
+/* Game sections common styles */
+.game-section {
+    min-height: 10vh;
+    padding: 80px 20px 40px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #e0dece;
+    text-shadow: 2px 2px 0 #1a1822;
+    font-size: 24px;
+    animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+.section-subtitle {
+    color: #a08c70;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 0 rgba(26, 24, 34, 0.6);
+}
+
+.game-panel {
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(42, 40, 51, 0.9);
+    border: 3px solid #58535e;
+    border-radius: 0px;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.panel-title {
+    margin-bottom: 15px;
+    color: #e0dece;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Pixelated background elements */
+.scene-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+/* Different background styles for different sections */
+.welcome-bg {
+    background-color: #2a2833;
+    background-image:
+        linear-gradient(0deg, #232431 10%, transparent 10%),
+        linear-gradient(90deg, rgba(42, 40, 58, 0.5) 10%, transparent 10%);
+    background-size: 10px 10px;
+}
+
+.experience-bg {
+    background-color: #2f2a37;
+    background-image:
+        linear-gradient(0deg, #252230 10%, transparent 10%),
+        linear-gradient(90deg, rgba(48, 44, 58, 0.4) 10%, transparent 10%);
+    background-size: 15px 15px;
+}
+
+.skills-bg {
+    background-color: #2d3334;
+    background-image:
+        linear-gradient(0deg, #242a2b 10%, transparent 10%),
+        linear-gradient(90deg, rgba(45, 51, 52, 0.4) 10%, transparent 10%);
+    background-size: 12px 12px;
+}
+
+.education-bg {
+    background-color: #33293a;
+    background-image:
+        linear-gradient(0deg, #29222f 10%, transparent 10%),
+        linear-gradient(90deg, rgba(51, 41, 58, 0.4) 10%, transparent 10%);
+    background-size: 10px 10px;
+}
+
+.publications-bg {
+    background-color: #353129;
+    background-image:
+        linear-gradient(0deg, #2b2821 10%, transparent 10%),
+        linear-gradient(90deg, rgba(53, 49, 41, 0.4) 10%, transparent 10%);
+    background-size: 15px 15px;
+}
+
+.contact-bg {
+    background-color: #2a3035;
+    background-image:
+        linear-gradient(0deg, #22262b 10%, transparent 10%),
+        linear-gradient(90deg, rgba(42, 48, 53, 0.4) 10%, transparent 10%);
+    background-size: 8px 8px;
+}
+
+/* Pixel art clouds */
+.pixel-clouds {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    width: 200%;
+    height: 50px;
+    animation: cloudMove 120s linear infinite;
+    z-index: -1;
+}
+
+.pixel-cloud {
+    position: absolute;
+    background-color: rgba(55, 53, 68, 0.6);
+    box-shadow: 10px 10px 0 rgba(55, 53, 68, 0.3);
+}
+
+.cloud1 {
+    width: 60px;
+    height: 20px;
+    left: 10%;
+    top: 0;
+}
+
+.cloud2 {
+    width: 40px;
+    height: 15px;
+    left: 30%;
+    top: 20px;
+}
+
+.cloud3 {
+    width: 50px;
+    height: 15px;
+    left: 60%;
+    top: 5px;
+}
+
+.cloud4 {
+    width: 70px;
+    height: 25px;
+    left: 80%;
+    top: 15px;
+}
+
+/* Ground elements */
+.ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    z-index: -1;
+}
+
+.welcome-ground {
+    background-color: #3c3a45;
+    border-top: 3px solid #2a2833;
+}
+
+.experience-ground {
+    background-color: #433c4e;
+    border-top: 3px solid #2f2a37;
+}
+
+.skills-ground {
+    background-color: #3e4545;
+    border-top: 3px solid #2d3334;
+}
+
+.education-ground {
+    background-color: #473950;
+    border-top: 3px solid #33293a;
+}
+
+.publications-ground {
+    background-color: #474138;
+    border-top: 3px solid #353129;
+}
+
+.contact-ground {
+    background-color: #3a4148;
+    border-top: 3px solid #2a3035;
+}
+
+/* Section-specific styles */
+/* Welcome section - Inventory Style */
+#welcome {
+    justify-content: center;
+    text-align: center;
+}
+
+/* Inventory style layout for desktop */
+.welcome-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.inventory-row {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.inventory-col {
+    flex: 1;
+}
+
+.character-display {
+    display: flex;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: rgba(42, 40, 51, 0.9);
+    border: 3px solid #58535e;
+    border-radius: 0px;
+    width: 100%;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.pixel-character {
+    width: 120px;
+    height: 120px;
+    margin-right: 20px;
+    position: relative;
+    background-image: url('https://i.imgur.com/PHKdqGW.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.character-info {
+    flex: 1;
+    text-align: left;
+}
+
+.character-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.character-name {
+    color: #e0dece;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.character-title {
+    color: #a08c70;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.welcome-text {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: left;
+    color: #c5c2b8;
+}
+
+.welcome-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.start-button {
+    display: block;
+    width: 200px;
+    padding: 15px;
+    background-color: #8c4646;
+    border: none;
+    border-radius: 0px;
+    color: #e0dece;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 4px 0 #5e2e2e;
+    position: relative;
+    animation: pulse 1.5s infinite alternate;
+}
+
+.start-button:active {
+    top: 4px;
+    box-shadow: none;
+}
+
+.press-start {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #a08c70;
+    font-size: 14px;
+    animation: blink 1s infinite;
+    text-shadow: 1px 1px 0 rgba(26, 24, 34, 0.7);
+}
+
+/* New inventory grid for skills and achievements */
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    width: 100%;
+}
+
+.inventory-slot {
+    position: relative;
+    height: 100px;
+    background-color: rgba(42, 40, 51, 0.9);
+    border: 3px solid #58535e;
+    border-radius: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.inventory-slot:hover {
+    transform: scale(1.05);
+    border-color: #a08c70;
+    z-index: 10;
+}
+
+.inventory-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: #e0dece;
+    text-shadow: 1px 1px 0 #1a1822;
+    border-radius: 0px;
+}
+
+.inventory-name {
+    font-size: 12px;
+    text-align: center;
+    max-width: 100%;
+    color: #c5c2b8;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.inventory-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    padding: 12px;
+    background-color: #1a1822;
+    border: 2px solid #706454;
+    color: #e0dece;
+    font-size: 10px;
+    z-index: 30;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    text-align: left;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.inventory-slot:hover .inventory-tooltip {
+    opacity: 1;
+}
+
+.inventory-category {
+    margin-bottom: 30px;
+}
+
+.inventory-header {
+    background-color: #1a1822;
+    color: #e0dece;
+    padding: 12px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 16px;
+    border: 2px solid #58535e;
+    border-radius: 0px;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Skill icons with different colors - using a more muted palette */
+.skill-data {
+    background-color: #8c4646; /* muted red */
+}
+
+.skill-ml {
+    background-color: #465b78; /* muted blue */
+}
+
+.skill-nlp {
+    background-color: #567846; /* muted green */
+}
+
+.skill-ai {
+    background-color: #614b78; /* muted purple */
+}
+
+.skill-papers {
+    background-color: #8c784b; /* muted gold */
+}
+
+.skill-patent {
+    background-color: #614b78; /* muted purple */
+}
+
+.skill-exp {
+    background-color: #465b78; /* muted blue */
+}
+
+.skill-revenue {
+    background-color: #567846; /* muted green */
+}
+
+.skill-python {
+    background-color: #465b78; /* muted blue */
+}
+
+.skill-cloud {
+    background-color: #4a5464; /* slate blue */
+}
+
+.skill-teamlead {
+    background-color: #8c4646; /* muted red */
+}
+
+.skill-stats {
+    background-color: #614b78; /* muted purple */
+}
+
+/* Equipment/Skills section */
+.skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    width: 100%;
+}
+
+.skill-item {
+    position: relative;
+    height: 100px; /* Increased from 70px to match inventory-slot */
+    background-color: rgba(42, 40, 51, 0.9); /* Updated to match inventory-slot */
+    border: 3px solid #58535e; /* Increased from 2px to match inventory-slot */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1); /* Updated to match inventory-slot */
+}
+
+.skill-item:hover {
+    transform: scale(1.05);
+    background-color: #4e4b5a;
+    z-index: 10;
+    border-color: #706454;
+}
+
+.skill-icon {
+    width: 40px; /* Increased from 20px to match inventory-icon */
+    height: 40px; /* Increased from 20px to match inventory-icon */
+    margin-bottom: 10px; /* Increased from 2px to match inventory-icon */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #e0dece;
+    border-radius: 0px;
+}
+
+.skill-name {
+    font-size: 10px; /* Increased from 9px to match inventory-name */
+    text-align: center;
+    max-width: 100%;
+    color: #c5c2b8;
+    line-height: 1.4; /* Updated to match inventory-name */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.skill-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    padding: 10px;
+    background-color: #1a1822;
+    border: 2px solid #706454;
+    color: #e0dece;
+    font-size: 10px;
+    z-index: 30;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    text-align: left;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.skill-item:hover .skill-tooltip {
+    opacity: 1;
+}
+
+.tooltip-title {
+    color: #a08c70;
+    margin-bottom: 5px;
+    font-size: 10px;
+}
+
+.tooltip-desc {
+    margin-bottom: 5px;
+    color: #c5c2b8;
+}
+
+.tooltip-stat {
+    color: #7a9463;
+}
+
+.legendary .skill-icon {
+    background-color: #8c784b; /* muted gold */
+    animation: glow 1s ease-in-out infinite alternate;
+}
+
+.rare .skill-icon {
+    background-color: #614b78; /* muted purple */
+    animation: glow 1.5s ease-in-out infinite alternate;
+}
+.skill-icon img {
+    width: 25px; /* Updated from 15px to match inventory-icon images */
+    height: 25px; /* Updated from 15px to match inventory-icon images */
+}
+
+.common .skill-icon {
+    background-color: #465b78; /* muted blue */
+}
+
+/* Experience section */
+.quest-list {
+    width: 100%;
+    max-width: 800px;
+}
+
+.quest-item {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: rgba(42, 40, 51, 0.9);
+    border: 3px solid #58535e;
+    border-radius: 0px;
+    position: relative;
+    transition: transform 0.3s;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.quest-item:hover {
+    transform: translateY(-5px);
+}
+
+.quest-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.quest-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+    background-color: #2a2833;
+    border: 2px solid #58535e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: #e0dece;
+}
+
+.quest-title {
+    font-size: 14px;
+    color: #e0dece;
+}
+
+.quest-company {
+    font-size: 12px;
+    color: #a08c70;
+    margin-bottom: 5px;
+}
+
+.quest-date {
+    font-size: 10px;
+    color: #928d82;
+}
+
+.quest-rewards {
+    margin-top: 15px;
+}
+
+.quest-reward-title {
+    font-size: 12px;
+    color: #7a9463;
+    margin-bottom: 10px;
+}
+
+.quest-achievements {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quest-achievement {
+    display: flex;
+    align-items: flex-start;
+}
+
+.achievement-marker {
+    width: 10px;
+    height: 10px;
+    background-color: #a08c70;
+    margin-right: 10px;
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.achievement-text {
+    font-size: 12px;
+    flex: 1;
+    color: #c5c2b8;
+}
+
+.quest-level {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #8c4646;
+    color: #e0dece;
+    font-size: 12px;
+    padding: 5px 10px;
+    border: 2px solid #58535e;
+    z-index: 5;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Education section */
+.education-list {
+    width: 100%;
+    max-width: 800px;
+}
+
+.education-item {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: rgba(42, 40, 51, 0.9);
+    border: 3px solid #58535e;
+    border-radius: 0px;
+    position: relative;
+    transition: transform 0.3s;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.education-item:hover {
+    transform: translateY(-5px);
+}
+
+.education-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.education-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+    background-color: #2a2833;
+    border: 2px solid #58535e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: #e0dece;
+}
+
+.education-title {
+    font-size: 14px;
+    color: #e0dece;
+}
+
+.education-school {
+    font-size: 12px;
+    color: #a08c70;
+    margin-bottom: 5px;
+}
+
+.education-date {
+    font-size: 10px;
+    color: #928d82;
+}
+
+.education-details {
+    font-size: 12px;
+    margin-top: 10px;
+    color: #c5c2b8;
+}
+
+.education-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #614b78;
+    color: #e0dece;
+    font-size: 12px;
+    padding: 5px 10px;
+    border: 2px solid #58535e;
+    z-index: 5;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Publications section */
+.scroll-list {
+    width: 100%;
+    max-width: 800px;
+}
+
+.scroll-item {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: rgba(42, 40, 51, 0.9);
+    border: 3px solid #58535e;
+    border-radius: 0px;
+    position: relative;
+    transition: transform 0.3s;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.scroll-item:hover {
+    transform: translateY(-5px);
+}
+
+.scroll-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.scroll-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+    background-color: #2a2833;
+    border: 2px solid #58535e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: #e0dece;
+}
+
+.scroll-title {
+    font-size: 14px;
+    color: #e0dece;
+}
+
+.scroll-journal {
+    font-size: 12px;
+    color: #a08c70;
+    margin-bottom: 5px;
+}
+
+.scroll-date {
+    font-size: 10px;
+    color: #928d82;
+}
+
+.scroll-description {
+    font-size: 12px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    color: #c5c2b8;
+}
+
+.scroll-link {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #706454;
+    color: #e0dece;
+    font-size: 10px;
+    text-decoration: none;
+    border: 2px solid #58535e;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.scroll-link:hover {
+    background-color: #8c784b;
+    color: #e0dece;
+}
+
+/* Contact section */
+.dialog-box {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    background-color: rgba(42, 40, 51, 0.9);
+    border: 3px solid #58535e;
+    border-radius: 0px;
+    margin-bottom: 30px;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dialog-text {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    color: #c5c2b8;
+}
+
+.dialog-continue {
+    text-align: right;
+    color: #a08c70;
+    animation: blink 1s infinite;
+    font-size: 12px;
+}
+
+.contact-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.contact-method {
+    padding: 15px;
+    background-color: rgba(42, 40, 51, 0.9);
+    border: 3px solid #58535e;
+    border-radius: 0px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+    text-decoration: none;
+    color: #c5c2b8;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.contact-method:hover {
+    transform: translateY(-5px);
+    background-color: rgba(58, 55, 69, 0.95);
+}
+
+.contact-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #a08c70;
+}
+
+.contact-label {
+    font-size: 12px;
+}
+
+/* Footer */
+.game-footer {
+    background-color: #1a1822;
+    padding: 20px;
+    text-align: center;
+    border-top: 3px solid #8c4646;
+}
+
+.footer-text {
+    font-size: 10px;
+    color: #928d82;
+    margin-bottom: 10px;
+}
+
+.game-credits {
+    font-size: 12px;
+    color: #e0dece;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.copyright {
+    font-size: 10px;
+    color: #928d82;
+}
+
+/* CRT screen effect - much lighter */
+.crt-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    z-index: 1001;
+    opacity: 0.2;
+}
+
+/* Animations */
+@keyframes characterIdle {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(2px); }
+}
+
+@keyframes glow {
+    0% { box-shadow: 0 0 5px 2px rgba(112, 100, 84, 0.3); }
+    100% { box-shadow: 0 0 10px 4px rgba(112, 100, 84, 0.5); }
+}
+
+@keyframes titleGlow {
+    0% { text-shadow: 0 0 5px rgba(112, 100, 84, 0.3), 2px 2px 0 rgba(26, 24, 34, 0.5); }
+    100% { text-shadow: 0 0 10px rgba(112, 100, 84, 0.5), 2px 2px 0 rgba(26, 24, 34, 0.7); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+@keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+
+@keyframes cloudMove {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes float {
+    0% { transform: translateY(0); opacity: 0.8; }
+    100% { transform: translateY(-10px); opacity: 0; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .game-ui-header {
+        padding: 5px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .game-menu {
+        margin-top: 10px;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .menu-button {
+        font-size: 15px;
+        padding: 4px 6px;
+    }
+
+    .stat-bar {
+        width: 70px;
+    }
+
+    .character-display {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .pixel-character {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .skill-grid,
+    .contact-methods {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .section-title {
+        font-size: 16px;
+        margin-top: 30px; /* Push down the title on mobile */
+    }
+
+    .quest-header,
+    .education-header,
+    .scroll-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .quest-icon,
+    .education-icon,
+    .scroll-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .game-navigation {
+        display: none;
+        top: 60px;
+        right: 10px;
+        transform: none;
+        background-color: rgba(26, 24, 34, 0.9);
+        padding: 10px;
+        border: 2px solid #58535e;
+    }
+
+    .game-navigation.mobile-visible {
+        display: flex;
+    }
+
+    /* Reorder columns on mobile */
+    .inventory-row {
+        flex-direction: column;
+    }
+
+    /* Force order on mobile: character first, then inventory items */
+    .inventory-col.char-col {
+        order: 1;
+    }
+
+    .inventory-col.items-col {
+        order: 2;
+    }
+
+    .inventory-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Adjust welcome section spacing on mobile */
+    #welcome {
+        padding-top: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .skill-grid,
+    .contact-methods {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+
+    .quest-item,
+    .education-item,
+    .scroll-item {
+        padding: 10px;
+    }
+
+    .skill-tooltip {
+        width: 150px;
+        font-size: 9px;
+    }
+
+    .start-button {
+        width: 180px;
+        font-size: 14px;
+    }
+
+    /* Additional mobile title adjustment */
+    .section-title {
+        margin-top: 40px;
+    }
+
+    .inventory-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .inventory-slot {
+        height: 80px;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- CRT screen effect overlay -->
+    <div class="crt-effect"></div>
+
+    <!-- Game UI Header -->
+    <div class="game-ui-header">
+        <div class="player-stats">
+            <div class="player-name">DVIR COHEN <span class="player-level" id="playerLevel">LVL 1</span></div>
+            <div class="stat-bars">
+                <div class="stat-row">
+                    <div class="stat-label">HP</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill hp-fill" id="hpFill"></div>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">MP</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill mp-fill" id="mpFill"></div>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">XP</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill xp-fill" id="xpFill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="game-menu">
+            <button class="menu-button" data-goto="welcome">HOME</button>
+            <button class="menu-button" data-goto="experience">QUESTS</button>
+            <button class="menu-button" data-goto="skills">SKILLS</button>
+            <button class="menu-button" data-goto="education">TRAINING</button>
+            <button class="menu-button" data-goto="contact">CONTACT</button>
+        </div>
+    </div>
+
+    <!-- Game Navigation Sidebar -->
+    <div class="game-navigation" id="gameNav">
+        <div class="nav-item active" data-goto="welcome"></div>
+        <div class="nav-item" data-goto="experience"></div>
+        <div class="nav-item" data-goto="skills"></div>
+        <div class="nav-item" data-goto="education"></div>
+        <div class="nav-item" data-goto="publications"></div>
+        <div class="nav-item" data-goto="contact"></div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div class="game-container">
+        <!-- Welcome/Title Section -->
+        <section id="welcome" class="game-section">
+            <div class="scene-background welcome-bg"></div>
+            <div class="pixel-clouds">
+                <div class="pixel-cloud cloud1"></div>
+                <div class="pixel-cloud cloud2"></div>
+                <div class="pixel-cloud cloud3"></div>
+                <div class="pixel-cloud cloud4"></div>
+            </div>
+            <div class="ground welcome-ground"></div>
+
+            <h1 class="section-title">DVIR COHEN: DATA QUEST</h1>
+
+            <div class="welcome-container">
+                <div class="inventory-row">
+                    <!-- Left column: Character info -->
+                    <div class="inventory-col char-col">
+                        <div class="character-display">
+                            <div class="pixel-character"></div>
+                            <div class="character-info">
+                                <div class="character-name">DVIR COHEN</div>
+                                <div class="character-title">SENIOR DATA SCIENTIST</div>
+                                <div class="dialog-text">
+                                    Accomplished Data Scientist with over 10 years of experience in data analysis, machine learning, and natural language processing (NLP). Demonstrated success in developing and implementing advanced machine learning models across diverse industries, with a focus on enhancing product offerings and user experiences.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right column: Inventory style skills and achievements -->
+                    <div class="inventory-col items-col">
+                        <div class="inventory-category">
+                            <div class="inventory-header">EQUIPPED SKILLS</div>
+                            <div class="inventory-grid">
+                                <div class="inventory-slot">
+                                    <div class="inventory-icon skill-data"><img src="https://cdn-icons-png.flaticon.com/512/2906/2906274.png" alt="Data Analysis" style="width: 25px; height: 25px;"></div>
+                                    <div class="inventory-name">DATA ANALYSIS</div>
+                                    <div class="inventory-tooltip">
+                                        <div class="tooltip-title">DATA ANALYSIS</div>
+                                        <div class="tooltip-desc">Expert-level skill in analyzing complex datasets and extracting insights</div>
+                                        <div class="tooltip-stat">+50 Data Insight</div>
+                                        <div class="tooltip-stat">+30 Decision Power</div>
+                                    </div>
+                                </div>
+
+                                <div class="inventory-slot">
+                                    <div class="inventory-icon skill-ml"><img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" alt="Machine Learning" style="width: 25px; height: 25px;"></div>
+                                    <div class="inventory-name">MACHINE LEARNING</div>
+                                    <div class="inventory-tooltip">
+                                        <div class="tooltip-title">MACHINE LEARNING</div>
+                                        <div class="tooltip-desc">Mastery of supervised and unsupervised learning algorithms</div>
+                                        <div class="tooltip-stat">+45 Prediction Power</div>
+                                        <div class="tooltip-stat">+25 Automation</div>
+                                    </div>
+                                </div>
+
+                                <div class="inventory-slot">
+                                    <div class="inventory-icon skill-nlp"><img src="https://cdn-icons-png.flaticon.com/512/3062/3062634.png" alt="NLP" style="width: 25px; height: 25px;"></div>
+                                    <div class="inventory-name">NATURAL LANGUAGE PROCESSING</div>
+                                    <div class="inventory-tooltip">
+                                        <div class="tooltip-title">NATURAL LANGUAGE PROCESSING</div>
+                                        <div class="tooltip-desc">Expert in text analysis, language modeling, and text generation</div>
+                                        <div class="tooltip-stat">+45 Text Understanding</div>
+                                        <div class="tooltip-stat">+40 Language Generation</div>
+                                    </div>
+                                </div>
+
+                                <div class="inventory-slot">
+                                    <div class="inventory-icon skill-ai"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBkGZMOjNfNdWzIk-bqdZb7A_xkkaX986-rw&s" alt="AI" style="width: 25px; height: 25px;"></div>
+                                    <div class="inventory-name">GENERATIVE AI</div>
+                                    <div class="inventory-tooltip">
+                                        <div class="tooltip-title">GENERATIVE AI</div>
+                                        <div class="tooltip-desc">Work with cutting-edge generative AI models and techniques</div>
+                                        <div class="tooltip-stat">+40 Content Creation</div>
+                                        <div class="tooltip-stat">+35 Innovation</div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="inventory-category">
+                            <div class="inventory-header">KEY ACHIEVEMENTS</div>
+                            <div class="inventory-grid">
+                                <div class="inventory-slot">
+                                    <div class="inventory-icon skill-papers"><img src="https://cdn-icons-png.flaticon.com/512/2541/2541988.png" alt="Research Papers" style="width: 25px; height: 25px;"></div>
+                                    <div class="inventory-name">RESEARCH PAPERS</div>
+                                    <div class="inventory-tooltip">
+                                        <div class="tooltip-title">RESEARCH PAPERS</div>
+                                        <div class="tooltip-desc">Published multiple papers in respected computer science journals</div>
+                                        <div class="tooltip-stat">+30 Academic Prestige</div>
+                                    </div>
+                                </div>
+
+                                <div class="inventory-slot">
+                                    <div class="inventory-icon skill-patent"><img src="https://cdn-icons-png.flaticon.com/512/1265/1265907.png" alt="Patents" style="width: 25px; height: 25px;"></div>
+                                    <div class="inventory-name">PATENTS</div>
+                                    <div class="inventory-tooltip">
+                                        <div class="tooltip-title">PATENT</div>
+                                        <div class="tooltip-desc">Method and System for Clustering Darknet Traffic Streams with Word Embeddings</div>
+                                        <div class="tooltip-stat">+50 Innovation</div>
+                                    </div>
+                                </div>
+
+                                <div class="inventory-slot">
+                                    <div class="inventory-icon skill-exp"><img src="https://cdn-icons-png.flaticon.com/512/3095/3095221.png" alt="Experience" style="width: 25px; height: 25px;"></div>
+                                    <div class="inventory-name">10+ YRS EXP</div>
+                                    <div class="inventory-tooltip">
+                                        <div class="tooltip-title">INDUSTRY EXPERIENCE</div>
+                                        <div class="tooltip-desc">Over 11 years of experience in data science and machine learning</div>
+                                        <div class="tooltip-stat">+60 Industry Knowledge</div>
+                                    </div>
+                                </div>
+
+
+                                <div class="inventory-slot">
+                                    <div class="inventory-icon skill-teamlead"><img src="https://cdn-icons-png.flaticon.com/512/5351/5351048.png" alt="Team Leadership" style="width: 25px; height: 25px;"></div>
+                                    <div class="inventory-name">PROJECT LEADERSHIP</div>
+                                    <div class="inventory-tooltip">
+                                        <div class="tooltip-title">PROJECT LEADERSHIP</div>
+                                        <div class="tooltip-desc">Led cross-functional teams in developing and implementing data science solutions</div>
+                                        <div class="tooltip-stat">+40 Leadership</div>
+                                        <div class="tooltip-stat">+35 Team Management</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="welcome-actions">
+                <button class="start-button" id="startButton">START ADVENTURE</button>
+            </div>
+
+            <div class="press-start">PRESS SPACE OR SCROLL TO CONTINUE</div>
+        </section>
+
+        <!-- Experience/Quests Section -->
+        <section id="experience" class="game-section">
+            <div class="scene-background experience-bg"></div>
+            <div class="pixel-clouds">
+                <div class="pixel-cloud cloud1"></div>
+                <div class="pixel-cloud cloud2"></div>
+                <div class="pixel-cloud cloud3"></div>
+                <div class="pixel-cloud cloud4"></div>
+            </div>
+            <div class="ground experience-ground"></div>
+
+            <h1 class="section-title">COMPLETED QUESTS</h1>
+            <h2 class="section-subtitle">PROFESSIONAL JOURNEY</h2>
+
+            <div class="quest-list">
+                <div class="quest-item">
+                    <div class="quest-level">SENIOR</div>
+                    <div class="quest-header">
+                        <div class="quest-icon"><img src="https://logos-world.net/wp-content/uploads/2020/11/WIX-Logo.jpg" alt="Wix" style="width: 70px; height: 30px;"></div>
+                        <div>
+                            <div class="quest-title">SENIOR DATA SCIENTIST</div>
+                            <div class="quest-company">Wix.com</div>
+                            <div class="quest-date">December 2021 – Present</div>
+                        </div>
+                    </div>
+
+                    <div class="quest-rewards">
+                        <div class="quest-reward-title">ACHIEVEMENTS:</div>
+                        <div class="quest-achievements">
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Lead the development of data-driven solutions to optimize user engagement and product functionality</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Collaborate with cross-functional teams to integrate machine learning models into various platforms</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Conduct research on generative AI and contribute to the company's AI initiatives</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quest-item">
+                    <div class="quest-level">EXPERT</div>
+                    <div class="quest-header">
+                        <div class="quest-icon"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIBQazfNnK0pKg95z11LNc5pqcH-1FEWTsug&s" alt="Explorium" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="quest-title">CUSTOMER FACING DATA SCIENTIST</div>
+                            <div class="quest-company">Explorium.ai</div>
+                            <div class="quest-date">September 2020 – December 2021</div>
+                        </div>
+                    </div>
+
+                    <div class="quest-rewards">
+                        <div class="quest-reward-title">ACHIEVEMENTS:</div>
+                        <div class="quest-achievements">
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Designed and implemented end-to-end machine learning solutions for both internal use and external clients</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Worked on a variety of use cases, including fraud detection, churn prediction, lead scoring, and lifetime value prediction</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Managed the entire product pipeline: exploratory analysis, feature engineering, algorithm development, evaluation, and incorporating customer feedback</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Successfully executed multiple machine learning proof-of-concepts, resulting in over $500,000 increase in annual recurring revenue</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quest-item">
+                    <div class="quest-level">SENIOR</div>
+                    <div class="quest-header">
+                        <div class="quest-icon"><img src="https://www.telekom.com/resource/blob/1002354/12f9f204ed4293439e1c93f7851ae186/dl-telekom-logo-01-data.jpg" alt="Deutsche Telekom" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="quest-title">SENIOR DATA SCIENTIST</div>
+                            <div class="quest-company">Deutsche Telekom</div>
+                            <div class="quest-date">March 2017 – September 2020</div>
+                        </div>
+                    </div>
+
+                    <div class="quest-rewards">
+                        <div class="quest-reward-title">ACHIEVEMENTS:</div>
+                        <div class="quest-achievements">
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Identified business problems solvable through analytics and guided team projects from an analytical perspective</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Developed prototype models and proofs of concept for various applications</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Led the analytic components of products, including exploratory analysis, feature engineering, algorithm development, and evaluation</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Designed big data systems for telecom security-fraud analytics</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quest-item">
+                    <div class="quest-level">ROOKIE</div>
+                    <div class="quest-header">
+                        <div class="quest-icon"><img src="https://www.telekom.com/resource/blob/1002354/12f9f204ed4293439e1c93f7851ae186/dl-telekom-logo-01-data.jpg" alt="Deutsche Telekom" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="quest-title">DATA SCIENTIST</div>
+                            <div class="quest-company">Deutsche Telekom</div>
+                            <div class="quest-date">January 2017 – March 2017</div>
+                        </div>
+                    </div>
+
+                    <div class="quest-rewards">
+                        <div class="quest-reward-title">ACHIEVEMENTS:</div>
+                        <div class="quest-achievements">
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Designed a machine learning framework for detecting specific actions in encrypted traffic</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Defined and mapped security awareness taxonomy based on related work</div>
+                            </div>
+                            <div class="quest-achievement">
+                                <div class="achievement-marker"></div>
+                                <div class="achievement-text">Developed a machine learning tool for the automatic creation of fake CVs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills/Inventory Section -->
+        <section id="skills" class="game-section">
+            <div class="scene-background skills-bg"></div>
+            <div class="ground skills-ground"></div>
+
+            <h1 class="section-title">SKILL INVENTORY</h1>
+            <h2 class="section-subtitle">ABILITIES & EXPERTISE</h2>
+
+            <div class="game-panel">
+                <h3 class="panel-title">🧠 CORE COMPETENCIES</h3>
+                <div class="skill-grid">
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBkGZMOjNfNdWzIk-bqdZb7A_xkkaX986-rw&s" alt="Generative AI" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">GENERATIVE AI</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">GENERATIVE AI (GPT, Claude, LLaMA, Mistral, Gemini)</div>
+                            <div class="tooltip-desc">Mastery of frontier AI models that create text, code, and beyond.</div>
+                            <div class="tooltip-stat">🪄 +60 Creativity</div>
+                            <div class="tooltip-stat">📈 +40 Productivity Boost</div>
+                            <div class="tooltip-stat">🧠 +30 Cognitive Overload Resistance</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/3406/3406897.png" alt="Large Language Models" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">LARGE LANGUAGE MODELS</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">LARGE LANGUAGE MODELS (LLMs)</div>
+                            <div class="tooltip-desc">Command of transformer titans trained on internet-scale knowledge.</div>
+                            <div class="tooltip-stat">🧩 +55 Reasoning</div>
+                            <div class="tooltip-stat">📚 +50 Knowledge Recall</div>
+                            <div class="tooltip-stat">⚙️ +35 Adaptability</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/4226/4226397.png" alt="Prompt Engineering" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">PROMPT ENGINEERING</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">PROMPT ENGINEERING</div>
+                            <div class="tooltip-desc">Shaping your words like spells to guide AI responses.</div>
+                            <div class="tooltip-stat">💬 +60 Command over LLMs</div>
+                            <div class="tooltip-stat">🧠 +40 Few-shot Efficiency</div>
+                            <div class="tooltip-stat">🎯 +35 Response Relevance</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/1072/1072402.png" alt="RAG" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">RETRIEVAL-AUGMENTED GENERATION</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">RETRIEVAL-AUGMENTED GENERATION (RAG)</div>
+                            <div class="tooltip-desc">Infusing LLMs with external sources for grounded truth.</div>
+                            <div class="tooltip-stat">🔍 +50 Context Recall</div>
+                            <div class="tooltip-stat">📦 +45 Factual Accuracy</div>
+                            <div class="tooltip-stat">⚡ +30 Latency Optimization</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/2091/2091433.png" alt="Model Fine-tuning" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">MODEL FINE-TUNING</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">MODEL FINE-TUNING & INSTRUCTION TUNING</div>
+                            <div class="tooltip-desc">Specializing models with curated datasets and alignment techniques.</div>
+                            <div class="tooltip-stat">🛠 +55 Customization</div>
+                            <div class="tooltip-stat">📐 +50 Task Precision</div>
+                            <div class="tooltip-stat">🔐 +35 Compliance</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/1997/1997921.png" alt="Embedding Models" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">EMBEDDING MODELS</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">EMBEDDING MODELS & VECTOR SEARCH</div>
+                            <div class="tooltip-desc">Wielding embeddings to find the signal in the noise.</div>
+                            <div class="tooltip-stat">🧭 +50 Search Relevance</div>
+                            <div class="tooltip-stat">🧱 +45 Retrieval Power</div>
+                            <div class="tooltip-stat">⚡ +25 Speed Boost</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/2058/2058980.png" alt="Evaluation" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">MODEL EVALUATION</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">EVALUATION OF GENERATIVE MODELS</div>
+                            <div class="tooltip-desc">Judging your model like a wise elder—metrics and all.</div>
+                            <div class="tooltip-stat">🎓 +60 Judgment</div>
+                            <div class="tooltip-stat">🛡 +45 Faithfulness</div>
+                            <div class="tooltip-stat">🔍 +40 Insight Extraction</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-panel">
+                <h3 class="panel-title">📚 CLASSIC ML</h3>
+                <div class="skill-grid">
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/2103/2103832.png" alt="Supervised Learning" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">SUPERVISED LEARNING</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">SUPERVISED LEARNING</div>
+                            <div class="tooltip-desc">Expertise in classification and regression algorithms.</div>
+                            <div class="tooltip-stat">🎯 +50 Prediction</div>
+                            <div class="tooltip-stat">📈 +45 Accuracy</div>
+                            <div class="tooltip-stat">🧠 +35 Generalization</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/8048/8048544.png" alt="Unsupervised Learning" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">UNSUPERVISED LEARNING</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">UNSUPERVISED LEARNING (CLUSTERING, DIMENSIONALITY REDUCTION)</div>
+                            <div class="tooltip-desc">Finding hidden structure in unlabeled lands.</div>
+                            <div class="tooltip-stat">🧩 +50 Pattern Recognition</div>
+                            <div class="tooltip-stat">🌀 +40 Exploratory Power</div>
+                            <div class="tooltip-stat">📉 +35 Noise Reduction</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/9077/9077975.png" alt="Time Series Analysis" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">TIME SERIES ANALYSIS</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">TIME SERIES ANALYSIS</div>
+                            <div class="tooltip-desc">Harnessing trends, seasonality, and forecasting.</div>
+                            <div class="tooltip-stat">⏳ +45 Temporal Awareness</div>
+                            <div class="tooltip-stat">📈 +40 Trend Capture</div>
+                            <div class="tooltip-stat">📅 +35 Forecast Accuracy</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/2910/2910824.png" alt="Model Evaluation" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">MODEL EVALUATION & VALIDATION</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">MODEL EVALUATION & VALIDATION</div>
+                            <div class="tooltip-desc">Cross-validation, metrics, and test sets—your training dojo.</div>
+                            <div class="tooltip-stat">🧪 +50 Reliability</div>
+                            <div class="tooltip-stat">🔁 +40 Reproducibility</div>
+                            <div class="tooltip-stat">🔍 +30 Metric Mastery</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/5979/5979107.png" alt="Feature Engineering" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">FEATURE ENGINEERING</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">FEATURE ENGINEERING</div>
+                            <div class="tooltip-desc">Alchemizing raw data into pure predictive power.</div>
+                            <div class="tooltip-stat">⚗️ +60 Signal Boost</div>
+                            <div class="tooltip-stat">🧱 +45 Model Performance</div>
+                            <div class="tooltip-stat">🔧 +30 Customization</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-panel">
+                <h3 class="panel-title">🛠 TECHNICAL SKILLS</h3>
+                <div class="skill-grid">
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/5968/5968350.png" alt="Python" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">PYTHON</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">PYTHON (NumPy, Pandas, Scikit-learn, PyTorch)</div>
+                            <div class="tooltip-desc">Versatile, expressive, and your go-to spellbook for everything.</div>
+                            <div class="tooltip-stat">🐍 +65 Versatility</div>
+                            <div class="tooltip-stat">📊 +50 Data Wrangling</div>
+                            <div class="tooltip-stat">🤖 +45 Model Building</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/9090/9090646.png" alt="Hugging Face" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">HUGGING FACE TRANSFORMERS</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">HUGGING FACE TRANSFORMERS</div>
+                            <div class="tooltip-desc">Gateway to a world of ready-made LLMs and embeddings.</div>
+                            <div class="tooltip-stat">📦 +55 Model Access</div>
+                            <div class="tooltip-stat">⚙️ +50 Transfer Learning</div>
+                            <div class="tooltip-stat">💡 +40 Experimentation</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/6911/6911553.png" alt="LangChain" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">LANGCHAIN, LLAMAINDEX</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">LANGCHAIN, LLAMAINDEX</div>
+                            <div class="tooltip-desc">Your framework for chaining tools, memory, and logic into LLM agents.</div>
+                            <div class="tooltip-stat">🧱 +60 Modular Design</div>
+                            <div class="tooltip-stat">🧠 +45 Agent Orchestration</div>
+                            <div class="tooltip-stat">📚 +35 Knowledge Integration</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/10266/10266168.png" alt="OpenAI APIs" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">AI APIs</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">OPENAI, ANTHROPIC, COHERE, MISTRAL APIs</div>
+                            <div class="tooltip-desc">Binding with modern AI gods via their sacred endpoints.</div>
+                            <div class="tooltip-stat">⚡ +50 Integration Speed</div>
+                            <div class="tooltip-stat">🌐 +55 Model Flexibility</div>
+                            <div class="tooltip-stat">💰 -10 Cost Mana</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/3210/3210945.png" alt="Streamlit" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">STREAMLIT</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">STREAMLIT FOR APP PROTOTYPING</div>
+                            <div class="tooltip-desc">Turning scripts into sleek, interactive interfaces.</div>
+                            <div class="tooltip-stat">🎨 +50 Visual Appeal</div>
+                            <div class="tooltip-stat">🧪 +45 Rapid Testing</div>
+                            <div class="tooltip-stat">🚀 +35 User Feedback Loops</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-panel">
+                <h3 class="panel-title">LANGUAGES</h3>
+                <div class="skill-grid">
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/197/197374.png" alt="English" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">English</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">ENGLISH</div>
+                            <div class="tooltip-desc">Professional working proficiency</div>
+                            <div class="tooltip-stat">+50 Communication</div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item legendary">
+                        <div class="skill-icon"><img src="https://cdn-icons-png.flaticon.com/512/197/197577.png" alt="Hebrew" style="width: 15px; height: 15px;"></div>
+                        <div class="skill-name">Hebrew</div>
+                        <div class="skill-tooltip">
+                            <div class="tooltip-title">HEBREW</div>
+                            <div class="tooltip-desc">Native proficiency</div>
+                            <div class="tooltip-stat">+50 Communication</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education/Training Section -->
+        <section id="education" class="game-section">
+            <div class="scene-background education-bg"></div>
+            <div class="ground education-ground"></div>
+
+            <h1 class="section-title">TRAINING & LEARNING</h1>
+            <h2 class="section-subtitle">EDUCATION & ACHIEVEMENTS</h2>
+
+            <div class="education-list">
+                <div class="education-item">
+                    <div class="education-badge">MASTER</div>
+                    <div class="education-header">
+                        <div class="education-icon"><img src="https://cdn-icons-png.flaticon.com/512/3976/3976631.png" alt="Masters Degree" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="education-title">MASTER'S DEGREE IN SOFTWARE AND INFORMATION SYSTEMS ENGINEERING</div>
+                            <div class="education-school">Ben-Gurion University of the Negev</div>
+                            <div class="education-date">2018 – 2019</div>
+                        </div>
+                    </div>
+                    <div class="education-details">
+                        Specialization in Data Science and Machine Learning. Advanced coursework in algorithms, statistical methods, and information systems architecture.
+                    </div>
+                </div>
+
+                <div class="education-item">
+                    <div class="education-badge">B.A.</div>
+                    <div class="education-header">
+                        <div class="education-icon"><img src="https://cdn-icons-png.flaticon.com/512/2436/2436711.png" alt="Bachelors Degree" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="education-title">BACHELOR'S DEGREE IN COMPUTER SCIENCE</div>
+                            <div class="education-school">Ben-Gurion University of the Negev</div>
+                            <div class="education-date">2014 – 2018</div>
+                        </div>
+                    </div>
+                    <div class="education-details">
+                        Specialization in Big Data. Foundational coursework in computer science theory, software development, and data structures.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Publications Section -->
+        <section id="publications" class="game-section">
+            <div class="scene-background publications-bg"></div>
+            <div class="ground publications-ground"></div>
+
+            <h1 class="section-title">KNOWLEDGE SCROLLS</h1>
+            <h2 class="section-subtitle">PUBLICATIONS & RESEARCH</h2>
+
+            <div class="scroll-list">
+                <div class="scroll-item">
+                    <div class="scroll-header">
+                        <div class="scroll-icon"><img src="https://cdn-icons-png.flaticon.com/512/4335/4335518.png" alt="Patent" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="scroll-title">METHOD AND SYSTEM FOR CLUSTERING DARKNET TRAFFIC STREAMS WITH WORD EMBEDDINGS</div>
+                            <div class="scroll-journal">Patent</div>
+                            <div class="scroll-date"></div>
+                        </div>
+                    </div>
+                    <div class="scroll-description">
+                        Developed a system for analyzing and clustering darknet traffic streams using word embeddings, enhancing the detection of malicious activities.
+                    </div>
+                </div>
+
+                <div class="scroll-item">
+                    <div class="scroll-header">
+                        <div class="scroll-icon"><img src="https://cdn-icons-png.flaticon.com/512/3039/3039386.png" alt="Research Paper" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="scroll-title">HOW AND WHEN TO STOP THE CO-TRAINING PROCESS</div>
+                            <div class="scroll-journal">Expert Systems with Applications</div>
+                            <div class="scroll-date">September 17, 2021</div>
+                        </div>
+                    </div>
+                    <div class="scroll-description">
+                        This research explores optimal stopping criteria for co-training algorithms, providing a novel approach to semi-supervised learning efficiency.
+                    </div>
+                    <a href="https://doi.org/10.1016/j.eswa.2021.115841" class="scroll-link" target="_blank">READ SCROLL</a>
+                </div>
+
+                <div class="scroll-item">
+                    <div class="scroll-header">
+                        <div class="scroll-icon"><img src="https://cdn-icons-png.flaticon.com/512/3039/3039386.png" alt="Research Paper" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="scroll-title">ANDROID MALWARE DETECTION VIA AN APP SIMILARITY GRAPH</div>
+                            <div class="scroll-journal">Computers & Security</div>
+                            <div class="scroll-date">June 29, 2021</div>
+                        </div>
+                    </div>
+                    <div class="scroll-description">
+                        A groundbreaking approach to detecting Android malware by constructing and analyzing similarity graphs between applications.
+                    </div>
+                    <a href="https://doi.org/10.1016/j.cose.2021.102386" class="scroll-link" target="_blank">READ SCROLL</a>
+                </div>
+
+                <div class="scroll-item">
+                    <div class="scroll-header">
+                        <div class="scroll-icon"><img src="https://cdn-icons-png.flaticon.com/512/3039/3039386.png" alt="Research Paper" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="scroll-title">DANTE: A FRAMEWORK FOR MINING AND MONITORING DARKNET TRAFFIC</div>
+                            <div class="scroll-journal">European Symposium on Research in Computer Security (ESORICS)</div>
+                            <div class="scroll-date">July 7, 2020</div>
+                        </div>
+                    </div>
+                    <div class="scroll-description">
+                        Introduced DANTE, an innovative framework for analyzing darknet traffic to detect and monitor malicious network activities.
+                    </div>
+                    <a href="https://doi.org/10.48550/arXiv.2003.02575" class="scroll-link" target="_blank">READ SCROLL</a>
+                </div>
+
+                <div class="scroll-item">
+                    <div class="scroll-header">
+                        <div class="scroll-icon"><img src="https://cdn-icons-png.flaticon.com/512/3039/3039386.png" alt="Research Paper" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="scroll-title">GENERATION OF AUTOMATIC AND REALISTIC ARTIFICIAL PROFILES</div>
+                            <div class="scroll-journal">International Conference on Advances in Social Networks Analysis and Mining</div>
+                            <div class="scroll-date">July 16, 2018</div>
+                        </div>
+                    </div>
+                    <div class="scroll-description">
+                        Presented a method for generating realistic artificial profiles that can be used for security research and testing.
+                    </div>
+                    <a href="https://doi.org/10.1109/ASONAM.2018.8508242" class="scroll-link" target="_blank">READ SCROLL</a>
+                </div>
+
+                <div class="scroll-item">
+                    <div class="scroll-header">
+                        <div class="scroll-icon"><img src="https://cdn-icons-png.flaticon.com/512/3039/3039386.png" alt="Research Paper" style="width: 30px; height: 30px;"></div>
+                        <div>
+                            <div class="scroll-title">EMBEDDING-CENTRALITY: GENERIC CENTRALITY COMPUTATION USING NEURAL NETWORKS</div>
+                            <div class="scroll-journal">International Workshop on Complex Networks</div>
+                            <div class="scroll-date">February 15, 2018</div>
+                        </div>
+                    </div>
+                    <div class="scroll-description">
+                        Proposed a novel approach for computing node centrality in complex networks using neural network embeddings.
+                    </div>
+                    <a href="https://link.springer.com/chapter/10.1007/978-3-319-73198-8_8" class="scroll-link" target="_blank">READ SCROLL</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="game-section">
+            <div class="scene-background contact-bg"></div>
+            <div class="ground contact-ground"></div>
+
+            <h1 class="section-title">CONTACT QUEST</h1>
+            <h2 class="section-subtitle">JOIN FORCES WITH DVIR</h2>
+
+            <div class="dialog-box">
+                <div class="dialog-text">
+                    Interested in discussing data science, machine learning, or potential collaborations? I'm always open to connecting with fellow data enthusiasts, industry professionals, and potential employers. Choose your preferred method of communication to start a conversation!
+                </div>
+                <div class="dialog-continue">PRESS ENTER TO CONTINUE</div>
+            </div>
+
+            <div class="contact-methods">
+                <a href="mailto:dvircohn@gmail.com" class="contact-method">
+                    <div class="contact-icon"><img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="Email" style="width: 25px; height: 25px;"></div>
+                    <div class="contact-label">EMAIL</div>
+                </a>
+
+                <a href="https://www.linkedin.com/in/dvircohen/" target="_blank" class="contact-method">
+                    <div class="contact-icon"><img src="https://cdn-icons-png.flaticon.com/512/3536/3536505.png" alt="LinkedIn" style="width: 25px; height: 25px;"></div>
+                    <div class="contact-label">LINKEDIN</div>
+                </a>
+
+                <a href="https://medium.com/@dvircohen" target="_blank" class="contact-method">
+                    <div class="contact-icon"><img src="https://cdn-icons-png.flaticon.com/512/5968/5968906.png" alt="Medium" style="width: 25px; height: 25px;"></div>
+                    <div class="contact-label">MEDIUM</div>
+                </a>
+
+                <a href="tel:0503399721" class="contact-method">
+                    <div class="contact-icon"><img src="https://cdn-icons-png.flaticon.com/512/455/455705.png" alt="Phone" style="width: 25px; height: 25px;"></div>
+                    <div class="contact-label">CALL</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer/Credits Section -->
+        <div class="game-footer">
+            <div class="game-credits">
+                DVIR COHEN: DATA QUEST
+            </div>
+            <div class="footer-text">
+                THIS CV GAME IS NOT ACTUALLY PLAYABLE,<br>
+                BUT MY DATA SCIENCE SKILLS ARE VERY REAL!
+            </div>
+            <div class="copyright">
+                © 2023 DVIR COHEN - ALL RIGHTS RESERVED
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation elements
+            const navItems = document.querySelectorAll('.nav-item');
+            const menuButtons = document.querySelectorAll('.menu-button');
+            const gameNav = document.getElementById('gameNav');
+            const startButton = document.getElementById('startButton');
+
+            // Sections
+            const sections = document.querySelectorAll('.game-section');
+            const scrollIndicator = document.querySelector('.press-start');
+
+            // Stat elements
+            const hpFill = document.getElementById('hpFill');
+            const mpFill = document.getElementById('mpFill');
+            const xpFill = document.getElementById('xpFill');
+            const playerLevel = document.getElementById('playerLevel');
+
+            // Function to navigate to a section
+            function navigateToSection(sectionId) {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    window.scrollTo({
+                        top: section.offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+
+            // Start button functionality
+            if (startButton) {
+                startButton.addEventListener('click', function() {
+                    navigateToSection('experience');
+                });
+            }
+
+            // Setup navigation items
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-goto');
+                    navigateToSection(sectionId);
+                });
+            });
+
+            // Setup menu buttons
+            menuButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-goto');
+                    navigateToSection(sectionId);
+                });
+            });
+
+            // Update active navigation based on scroll
+            function updateActiveNavigation() {
+                let currentSectionId = '';
+                const scrollPosition = window.scrollY;
+
+                // Find the current section
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+
+                    if (scrollPosition >= sectionTop - 100 &&
+                        scrollPosition < sectionTop + sectionHeight - 100) {
+                        currentSectionId = section.id;
+                    }
+                });
+
+                // Update navigation highlights
+                if (currentSectionId) {
+                    // Update sidebar nav
+                    navItems.forEach(item => {
+                        if (item.getAttribute('data-goto') === currentSectionId) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+
+                    // Update menu buttons
+                    menuButtons.forEach(button => {
+                        if (button.getAttribute('data-goto') === currentSectionId) {
+                            button.style.backgroundColor = '#ff0';
+                        } else {
+                            button.style.backgroundColor = '';
+                        }
+                    });
+                }
+            }
+
+            // Update stats based on scroll position
+            function updateStats() {
+                // Calculate scroll percentage
+                const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollProgress = Math.min((window.scrollY / scrollTotal) * 100, 100);
+
+                // Update stat bars based on scroll progress
+                if (hpFill) hpFill.style.width = Math.min(20 + scrollProgress * 0.8, 100) + '%';
+                if (mpFill) mpFill.style.width = Math.min(15 + scrollProgress * 0.8, 95) + '%';
+                if (xpFill) xpFill.style.width = Math.min(10 + scrollProgress * 0.7, 80) + '%';
+
+                // Update player level
+                const level = Math.floor(1 + (scrollProgress / 100) * 98);
+                if (playerLevel) playerLevel.textContent = 'LVL ' + level;
+            }
+
+            // Typewriter effect for dialog text
+            const dialogTexts = document.querySelectorAll('.dialog-text');
+
+            dialogTexts.forEach(dialogText => {
+                const originalText = dialogText.textContent;
+                dialogText.textContent = '';
+
+                let i = 0;
+                const speed = 20; // typing speed (milliseconds)
+
+                function typeWriter() {
+                    if (i < originalText.length) {
+                        dialogText.textContent += originalText.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, speed);
+                    }
+                }
+
+                // Start the typewriter effect when in view
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(typeWriter, 500);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                observer.observe(dialogText);
+            });
+
+            // Add particle effects to character
+            const character = document.querySelector('.pixel-character');
+
+            if (character) {
+                setInterval(function() {
+                    if (Math.random() > 0.7) {
+                        const pixel = document.createElement('div');
+                        pixel.style.position = 'absolute';
+                        pixel.style.width = '4px';
+                        pixel.style.height = '4px';
+                        pixel.style.backgroundColor = '#ff0';
+                        pixel.style.top = Math.random() * 80 + 'px';
+                        pixel.style.left = Math.random() * 80 + 'px';
+                        pixel.style.opacity = '0.8';
+                        pixel.style.zIndex = '5';
+                        pixel.style.animation = 'float 1s ease-out forwards';
+
+                        character.appendChild(pixel);
+
+                        setTimeout(() => {
+                            pixel.remove();
+                        }, 1000);
+                    }
+                }, 100);
+            }
+
+            // Scroll handling
+            window.addEventListener('scroll', function() {
+                updateActiveNavigation();
+                updateStats();
+
+                // Hide start prompt when scrolled
+                if (window.scrollY > 100 && scrollIndicator) {
+                    scrollIndicator.style.opacity = '0';
+                } else if (scrollIndicator) {
+                    scrollIndicator.style.opacity = '1';
+                }
+            });
+
+            // Initial call to update stats
+            updateStats();
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.code === 'Space' && window.scrollY < 100) {
+                    // Start the adventure if at the top
+                    navigateToSection('experience');
+                    e.preventDefault();
+                } else if (e.code === 'Enter') {
+                    // Email contact on Enter key
+                    window.location.href = 'mailto:dvir.cohn@gmail.com';
+                }
+            });
+
+            // Initial call to set the active navigation
+            updateActiveNavigation();
+
+            // Add animation to skill items when they come into view
+            const skillItems = document.querySelectorAll('.skill-item, .inventory-slot');
+
+            const skillObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        skillObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            skillItems.forEach(item => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                skillObserver.observe(item);
+            });
+
+            // Similar fade-in animation for other content items
+            const animateElements = document.querySelectorAll('.quest-item, .education-item, .scroll-item, .contact-method');
+
+            const contentObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        contentObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            animateElements.forEach(item => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(30px)';
+                item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                contentObserver.observe(item);
+            });
+        });
+    </script>
+</body>
+</html>
